@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GL Strategic Engine | IT Staffing Vertical</title>
+    <title>GL Strategic Engine | Health Vertical</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e293b;
-            --accent: #3b82f6;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
             --bg: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --text-main: #1e293b;
             --text-dim: #64748b;
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -181,7 +181,7 @@
 
         .action-btn:hover {
             border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(52, 152, 219, 0.05);
             transform: translateY(-2px);
         }
 
@@ -195,11 +195,12 @@
             color: var(--text-dim);
         }
 
+        /* Central Graph Visualization Placeholder */
         .graph-container {
             flex: 1;
             min-height: 250px;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
             border-radius: 16px;
             position: relative;
             display: flex;
@@ -215,7 +216,7 @@
             line-height: 1;
             font-weight: 800;
             font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            text-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
         }
 
         .iteration-badge {
@@ -229,33 +230,26 @@
 
         .scenario-selector {
             display: flex;
-            flex-direction: column;
             gap: 0.5rem;
             margin-top: 1rem;
         }
 
         .scenario-btn {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: white;
-            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white;
             cursor: pointer;
-            font-size: 0.875rem;
-            text-align: left;
-            transition: all 0.2s;
-        }
-
-        .scenario-btn:hover {
-            border-color: var(--accent);
+            font-size: 0.8rem;
         }
 
         .scenario-btn.active {
             background: var(--accent);
             border-color: var(--accent);
-            color: white;
         }
 
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -270,82 +264,88 @@
 <body>
 
 <header>
-    <h1>IT Staffing Strategist <span style="font-weight: 300; opacity: 0.7;">| Talent Profitability Model</span></h1>
+    <h1>HealthEye Pro <span style="font-weight: 300; opacity: 0.7;">| Decision Intelligence</span></h1>
     <div class="header-badges">
-        <div class="badge badge-live">Engine v3.0</div>
+        <div class="badge badge-live">Live Engine</div>
         <div class="badge badge-mode" id="it-count">Iterations: 0</div>
     </div>
 </header>
 
 <main>
+    <!-- Column Left: Operation -->
     <div class="column">
         <div class="card animate">
-            <div class="card-title">⚙️ Palancas Operativas</div>
+            <div class="card-title">⚙️ Palancas de Operación</div>
             <div class="lever-group" id="lever-container">
+                <!-- Levers will be injected here -->
             </div>
         </div>
 
         <div class="card animate" style="animation-delay: 0.1s;">
-            <div class="card-title">📊 Escenarios de Mercado</div>
+            <div class="card-title">📊 Escenarios Estratégicos</div>
             <div class="scenario-selector" id="scenario-container">
+                <!-- Scenarios will be injected here -->
             </div>
         </div>
     </div>
 
+    <!-- Column Center: Risk & Graph -->
     <div class="column">
         <div class="graph-container animate" style="animation-delay: 0.2s;">
-            <div class="kpi-label" style="color: rgba(255,255,255,0.6)">EBITDA MENSUAL ESTIMADO (USD)</div>
-            <div class="ebitda-gauge" id="ebitda-val">$0</div>
+            <div class="kpi-label" style="color: rgba(255,255,255,0.6)">EBITDA MENSUAL ESTIMADO</div>
+            <div class="ebitda-gauge" id="ebitda-val">$0M</div>
             
             <div style="margin-top: 3rem; width: 80%; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                 <div class="kpi-box" style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
-                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">RIESGO MULTAS DT</div>
-                    <div class="kpi-value" id="risk-val" style="color: var(--warning)">$0</div>
+                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">RIESGO NORMATIVO</div>
+                    <div class="kpi-value" id="risk-val" style="color: var(--warning)">0%</div>
                 </div>
                 <div class="kpi-box" style="text-align: center;">
-                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">COSTO RECLUTAMIENTO</div>
-                    <div class="kpi-value" id="rec-cost-val" style="color: var(--danger)">$0</div>
+                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">MULTAS ESTIMADAS</div>
+                    <div class="kpi-value" id="multas-val" style="color: var(--danger)">$0M</div>
                 </div>
             </div>
 
-            <div class="iteration-badge" id="engine-status">Causal Graph Converged</div>
+            <div class="iteration-badge" id="engine-status">Engine: Optimized</div>
         </div>
 
         <div class="card animate" style="animation-delay: 0.3s;">
-            <div class="card-title">🎯 Plan de Acción Estratégica</div>
+            <div class="card-title">🎯 Action Feed</div>
             <div class="action-feed" id="action-feed-container">
+                <!-- Actions will be injected here -->
             </div>
         </div>
     </div>
 
+    <!-- Column Right: Results -->
     <div class="column">
         <div class="card animate" style="animation-delay: 0.4s;">
-            <div class="card-title">📈 KPIs de Talento</div>
+            <div class="card-title">📈 KPIs Primarios</div>
             <div class="kpi-grid">
                 <div class="kpi-box">
-                    <div class="kpi-label">Utilización de Consultores</div>
-                    <div class="kpi-value" id="util-val">0%</div>
+                    <div class="kpi-label">Siniestralidad (Loss Ratio)</div>
+                    <div class="kpi-value" id="sini-val">0%</div>
                 </div>
                 <div class="kpi-box">
-                    <div class="kpi-label">Monthly Attrition (Churn)</div>
-                    <div class="kpi-value" id="attr-val">0%</div>
+                    <div class="kpi-label">Ocupación de Camas</div>
+                    <div class="kpi-value" id="occupancy-val">0%</div>
                 </div>
                 <div class="kpi-box">
-                    <div class="kpi-label">Índice de Productividad</div>
-                    <div class="kpi-value" id="prod-val">0</div>
+                    <div class="kpi-label">Capacidad Quirúrgica</div>
+                    <div class="kpi-value" id="cap-val">0</div>
                 </div>
                 <div class="kpi-box">
-                    <div class="kpi-label">Horas Facturadas HH</div>
-                    <div class="kpi-value" id="hh-val">0</div>
+                    <div class="kpi-label">Readmisiones (Circular)</div>
+                    <div class="kpi-value" id="readmit-val">0</div>
                 </div>
             </div>
         </div>
 
         <div class="card animate" style="animation-delay: 0.5s;">
-            <div class="card-title">⚖️ Ingresos Operacionales</div>
+            <div class="card-title">⚖️ Impacto Reputacional</div>
             <div class="kpi-box">
-                <div class="kpi-label">Facturación Mensual</div>
-                <div class="kpi-value" id="income-val" style="color: var(--success)">$0</div>
+                <div class="kpi-label">Costo por Judicialización</div>
+                <div class="kpi-value" id="reput-val" style="color: var(--danger)">$0M</div>
             </div>
         </div>
     </div>
@@ -353,51 +353,51 @@
 
 <script type="module">
     import StrategicEngine from './engine.js';
-    import { chassis } from './verticals/it_staffing/chassis.js';
-    import { body } from './verticals/it_staffing/body.js';
+    import { HealthChassis } from './chassis.js';
+    import { HealthBody } from './body.js';
+    import { runMonteCarlo } from './core/simulation.js';
 
+    // Initialize Engine
     const engine = new StrategicEngine(1000);
-    engine.setModel(chassis.model);
+    engine.setModel(HealthChassis.model);
 
-    let currentState = { ...chassis.scenarios.base.values };
+    let currentState = { ...HealthChassis.scenarios.base };
 
+    // DOM Elements
     const leverContainer = document.getElementById('lever-container');
     const scenarioContainer = document.getElementById('scenario-container');
     const actionContainer = document.getElementById('action-feed-container');
 
-    function formatCurrency(val) {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
-    }
-
+    // UI Builders
     function buildUI() {
-        Object.keys(chassis.inputs).forEach(key => {
-            const input = chassis.inputs[key];
+        // Build Levers
+        HealthChassis.levers.forEach(lever => {
             const div = document.createElement('div');
             div.className = 'lever';
             div.innerHTML = `
                 <div class="lever-header">
-                    <span>${input.label}</span>
-                    <span class="lever-val" id="val-${key}">${currentState[key]}${input.unit === 'percent' ? '%' : ''}</span>
+                    <span>${lever.label}</span>
+                    <span class="lever-val" id="val-${lever.key}">${currentState[lever.key]}${lever.unit}</span>
                 </div>
-                <input type="range" min="${input.min}" max="${input.max}" step="${input.step}" value="${currentState[key]}" data-key="${key}">
+                <input type="range" min="${lever.min}" max="${lever.max}" step="${lever.step}" value="${currentState[lever.key]}" data-key="${lever.key}">
             `;
             leverContainer.appendChild(div);
 
             div.querySelector('input').addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
-                currentState[key] = val;
-                document.getElementById(`val-${key}`).textContent = val + (input.unit === 'percent' ? '%' : '');
+                currentState[lever.key] = val;
+                document.getElementById(`val-${lever.key}`).textContent = val + lever.unit;
                 runSimulation();
             });
         });
 
-        Object.keys(chassis.scenarios).forEach(key => {
-            const scenario = chassis.scenarios[key];
+        // Build Scenarios
+        Object.keys(HealthChassis.scenarios).forEach(key => {
             const btn = document.createElement('button');
             btn.className = `scenario-btn ${key === 'base' ? 'active' : ''}`;
-            btn.textContent = scenario.label;
+            btn.textContent = key.replace('_', ' ').toUpperCase();
             btn.addEventListener('click', () => {
-                currentState = { ...scenario.values };
+                currentState = { ...HealthChassis.scenarios[key] };
                 document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 refreshLevers();
@@ -406,7 +406,8 @@
             scenarioContainer.appendChild(btn);
         });
 
-        body.actionFeed.forEach(action => {
+        // Build Action Feed
+        HealthBody.actionFeed.forEach(action => {
             const btn = document.createElement('button');
             btn.className = 'action-btn';
             btn.innerHTML = `
@@ -415,9 +416,10 @@
             `;
             btn.addEventListener('click', () => {
                 Object.keys(action.impact).forEach(k => {
-                    currentState[k] = (currentState[k] || 0) + action.impact[k];
-                    const input = chassis.inputs[k];
-                    if (input) currentState[k] = Math.max(input.min, Math.min(input.max, currentState[k]));
+                    currentState[k] += action.impact[k];
+                    // Clamp values
+                    const lever = HealthChassis.levers.find(l => l.key === k);
+                    if (lever) currentState[k] = Math.max(lever.min, Math.min(lever.max, currentState[k]));
                 });
                 refreshLevers();
                 runSimulation();
@@ -430,32 +432,66 @@
         document.querySelectorAll('input[type="range"]').forEach(input => {
             const key = input.dataset.key;
             input.value = currentState[key];
-            const config = chassis.inputs[key];
-            document.getElementById(`val-${key}`).textContent = currentState[key] + (config.unit === 'percent' ? '%' : '');
+            const lever = HealthChassis.levers.find(l => l.key === key);
+            document.getElementById(`val-${key}`).textContent = currentState[key] + lever.unit;
         });
     }
 
     function runSimulation() {
         const result = engine.iterate(currentState);
+        
+        // Ejecutar Monte Carlo y mezclar nodos virtuales en el resultado
+        const mcNodes = runMonteCarlo(engine.model, HealthChassis.levers, currentState, 1000);
+        Object.assign(result, mcNodes);
+
         updateDashboard(result);
     }
 
     function updateDashboard(res) {
-        document.getElementById('ebitda-val').textContent = formatCurrency(res.ebitda);
-        document.getElementById('util-val').textContent = `${res.tasa_utilizacion.toFixed(1)}%`;
-        document.getElementById('attr-val').textContent = `${res.attrition_mensual.toFixed(1)}%`;
-        document.getElementById('prod-val').textContent = res.productivity_index;
-        document.getElementById('hh-val').textContent = Math.round(res.horas_facturables).toLocaleString();
-        document.getElementById('risk-val').textContent = formatCurrency(res.riesgo_multas_dt);
-        document.getElementById('rec-cost-val').textContent = formatCurrency(res.costo_reclutamiento);
-        document.getElementById('income-val').textContent = formatCurrency(res.ingreso_operacional);
+        document.getElementById('ebitda-val').textContent = `$${res.ebitda.toFixed(1)}M`;
+        document.getElementById('sini-val').textContent = `${res.tasa_siniestralidad.toFixed(1)}%`;
+        document.getElementById('occupancy-val').textContent = `${res.ocupacion_camas.toFixed(1)}%`;
+        document.getElementById('cap-val').textContent = Math.round(res.capacidad_quirurgica);
+        document.getElementById('readmit-val').textContent = res.readmisiones.toFixed(1);
+        document.getElementById('risk-val').textContent = `${res.probabilidad_falla.toFixed(1)}%`;
+        document.getElementById('multas-val').textContent = `$${res.multas.toFixed(2)}M`;
+        document.getElementById('reput-val').textContent = `$${res.impacto_reputacional.toFixed(1)}M`;
         
         document.getElementById('it-count').textContent = `Iterations: ${res._metadata.iterations}`;
         
         const ebitdaEl = document.getElementById('ebitda-val');
-        if (res.ebitda > 500000) ebitdaEl.style.color = 'var(--success)';
-        else if (res.ebitda < 100000) ebitdaEl.style.color = 'var(--danger)';
+        if (res.ebitda > 500) ebitdaEl.style.color = 'var(--success)';
+        else if (res.ebitda < 0) ebitdaEl.style.color = 'var(--danger)';
         else ebitdaEl.style.color = 'var(--accent)';
+
+        // Inyectar el mensaje probabilístico en el Action Feed (Dashboard Premium)
+        const actionContainer = document.getElementById('action-feed-container');
+        // Remover mensaje probabilístico anterior si existe
+        const oldMsg = document.getElementById('mc-insight');
+        if (oldMsg) oldMsg.remove();
+        
+        if (res.ebitda_p50 !== undefined) {
+            const conf = (100 - res.probabilidad_perdida).toFixed(1);
+            const risk = res.probabilidad_perdida.toFixed(1);
+            
+            const insightDiv = document.createElement('div');
+            insightDiv.id = 'mc-insight';
+            insightDiv.style.padding = '1rem';
+            insightDiv.style.marginBottom = '1rem';
+            insightDiv.style.borderRadius = '8px';
+            insightDiv.style.background = risk > 20 ? 'rgba(231, 76, 60, 0.1)' : 'rgba(39, 174, 96, 0.1)';
+            insightDiv.style.border = `1px solid ${risk > 20 ? 'var(--danger)' : 'var(--success)'}`;
+            
+            insightDiv.innerHTML = `
+                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem;">🔮 Inteligencia Probabilística (1,000 iteraciones)</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim);">
+                    Hay un <strong>${conf}% de confianza</strong> de que el EBITDA superará los $${res.ebitda_p10.toFixed(1)}M USD (P10), 
+                    con un valor esperado de $${res.ebitda_p50.toFixed(1)}M USD (P50). 
+                    Existe un <strong>${risk}% de riesgo de pérdida operacional</strong> ($P(EBITDA < 0)$).
+                </div>
+            `;
+            actionContainer.prepend(insightDiv);
+        }
     }
 
     buildUI();

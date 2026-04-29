@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GL Strategic Engine | Health Vertical</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>GL Strategic Engine | Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2c3e50;
             --accent: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text-main: #1e293b;
             --text-dim: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -30,471 +27,152 @@
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
         header {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #1a252f);
             color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 100%;
+            padding: 3rem 2rem;
+            text-align: center;
             box-shadow: var(--shadow);
-            z-index: 10;
+            margin-bottom: 3rem;
         }
 
         header h1 {
-            font-size: 1.25rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
         }
 
-        .header-badges {
-            display: flex;
-            gap: 1rem;
+        header p {
+            font-weight: 300;
+            font-size: 1.125rem;
+            opacity: 0.8;
         }
-
-        .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-live { background: var(--success); color: white; }
-        .badge-mode { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
         main {
-            flex: 1;
             display: grid;
-            grid-template-columns: 320px 1fr 320px;
-            gap: 1.5rem;
-            padding: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .vertical-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
             overflow: hidden;
         }
 
-        .column {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-            padding: 0.5rem;
+        .vertical-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: var(--transition);
         }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+        .vertical-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .vertical-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
         }
 
         .card-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Levers */
-        .lever-group {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .lever {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .lever-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-        }
-
-        .lever-val {
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
             font-weight: 700;
+        }
+
+        .card-desc {
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .card-action {
+            margin-top: auto;
             color: var(--accent);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent);
-        }
-
-        /* KPIs */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .kpi-box {
-            text-align: left;
-        }
-
-        .kpi-label {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            margin-bottom: 0.25rem;
-        }
-
-        .kpi-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Action Feed */
-        .action-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .action-btn {
-            background: white;
-            border: 1px solid var(--border);
-            padding: 0.75rem;
-            border-radius: 8px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .action-btn:hover {
-            border-color: var(--accent);
-            background: rgba(52, 152, 219, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .action-label {
             font-weight: 600;
             font-size: 0.875rem;
-        }
-
-        .action-desc {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-        }
-
-        /* Central Graph Visualization Placeholder */
-        .graph-container {
-            flex: 1;
-            background: linear-gradient(135deg, #2c3e50, #1a252f);
-            border-radius: 16px;
-            position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            color: white;
-            overflow: hidden;
-        }
-
-        .ebitda-gauge {
-            font-size: 4rem;
-            font-weight: 800;
-            font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
-        }
-
-        .iteration-badge {
-            position: absolute;
-            bottom: 1rem;
-            right: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            opacity: 0.6;
-        }
-
-        .scenario-selector {
-            display: flex;
             gap: 0.5rem;
-            margin-top: 1rem;
         }
 
-        .scenario-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.1);
-            color: white;
-            cursor: pointer;
-            font-size: 0.8rem;
+        .card-action::after {
+            content: '→';
+            transition: var(--transition);
         }
 
-        .scenario-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
+        .vertical-card:hover .card-action::after {
+            transform: translateX(5px);
         }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
     </style>
 </head>
 <body>
 
 <header>
-    <h1>HealthEye Pro <span style="font-weight: 300; opacity: 0.7;">| Decision Intelligence</span></h1>
-    <div class="header-badges">
-        <div class="badge badge-live">Live Engine</div>
-        <div class="badge badge-mode" id="it-count">Iterations: 0</div>
-    </div>
+    <h1>GL Strategic Engine</h1>
+    <p>Decision Intelligence Hub</p>
 </header>
 
 <main>
-    <!-- Column Left: Operation -->
-    <div class="column">
-        <div class="card animate">
-            <div class="card-title">⚙️ Palancas de Operación</div>
-            <div class="lever-group" id="lever-container">
-                <!-- Levers will be injected here -->
-            </div>
-        </div>
+    <a href="/health.html" class="vertical-card">
+        <div class="card-icon">🏥</div>
+        <div class="card-title">HealthEye Pro</div>
+        <div class="card-desc">Optimización de EBITDA hospitalario, gestión de capacidad, siniestralidad y mitigación de riesgo legal.</div>
+        <div class="card-action">Entrar al Motor</div>
+    </a>
 
-        <div class="card animate" style="animation-delay: 0.1s;">
-            <div class="card-title">📊 Escenarios Estratégicos</div>
-            <div class="scenario-selector" id="scenario-container">
-                <!-- Scenarios will be injected here -->
-            </div>
-        </div>
-    </div>
+    <a href="/finops.html" class="vertical-card">
+        <div class="card-icon">🏦</div>
+        <div class="card-title">FinOps & Credit Risk</div>
+        <div class="card-desc">Simulación de límites de crédito, tasas de aprobación, riesgo de default y costos de cobranza.</div>
+        <div class="card-action">Entrar al Motor</div>
+    </a>
 
-    <!-- Column Center: Risk & Graph -->
-    <div class="column">
-        <div class="graph-container animate" style="animation-delay: 0.2s;">
-            <div class="kpi-label" style="color: rgba(255,255,255,0.6)">EBITDA MENSUAL ESTIMADO</div>
-            <div class="ebitda-gauge" id="ebitda-val">$0M</div>
-            
-            <div style="margin-top: 3rem; width: 80%; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                <div class="kpi-box" style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
-                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">RIESGO NORMATIVO</div>
-                    <div class="kpi-value" id="risk-val" style="color: var(--warning)">0%</div>
-                </div>
-                <div class="kpi-box" style="text-align: center;">
-                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">MULTAS ESTIMADAS</div>
-                    <div class="kpi-value" id="multas-val" style="color: var(--danger)">$0M</div>
-                </div>
-            </div>
+    <a href="/it_staffing.html" class="vertical-card">
+        <div class="card-icon">💻</div>
+        <div class="card-title">IT Staff Augmentation</div>
+        <div class="card-desc">Gestión de tasa de utilización, attrition, billing rate y márgenes operativos para servicios IT.</div>
+        <div class="card-action">Entrar al Motor</div>
+    </a>
 
-            <div class="iteration-badge" id="engine-status">Engine: Optimized</div>
-        </div>
-
-        <div class="card animate" style="animation-delay: 0.3s;">
-            <div class="card-title">🎯 Action Feed</div>
-            <div class="action-feed" id="action-feed-container">
-                <!-- Actions will be injected here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Column Right: Results -->
-    <div class="column">
-        <div class="card animate" style="animation-delay: 0.4s;">
-            <div class="card-title">📈 KPIs Primarios</div>
-            <div class="kpi-grid">
-                <div class="kpi-box">
-                    <div class="kpi-label">Siniestralidad (Loss Ratio)</div>
-                    <div class="kpi-value" id="sini-val">0%</div>
-                </div>
-                <div class="kpi-box">
-                    <div class="kpi-label">Ocupación de Camas</div>
-                    <div class="kpi-value" id="occupancy-val">0%</div>
-                </div>
-                <div class="kpi-box">
-                    <div class="kpi-label">Capacidad Quirúrgica</div>
-                    <div class="kpi-value" id="cap-val">0</div>
-                </div>
-                <div class="kpi-box">
-                    <div class="kpi-label">Readmisiones (Circular)</div>
-                    <div class="kpi-value" id="readmit-val">0</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card animate" style="animation-delay: 0.5s;">
-            <div class="card-title">⚖️ Impacto Reputacional</div>
-            <div class="kpi-box">
-                <div class="kpi-label">Costo por Judicialización</div>
-                <div class="kpi-value" id="reput-val" style="color: var(--danger)">$0M</div>
-            </div>
-        </div>
-    </div>
+    <a href="/retail.html" class="vertical-card">
+        <div class="card-icon">🛒</div>
+        <div class="card-title">Retail Strategy</div>
+        <div class="card-desc">Maximización de conversión, optimización de quiebres de stock y gestión del ticket promedio.</div>
+        <div class="card-action">Entrar al Motor</div>
+    </a>
 </main>
-
-<script type="module">
-    import StrategicEngine from './engine.js';
-    import { HealthChassis } from './chassis.js';
-    import { HealthBody } from './body.js';
-    import { runMonteCarlo } from './core/simulation.js';
-
-    // Initialize Engine
-    const engine = new StrategicEngine(1000);
-    engine.setModel(HealthChassis.model);
-
-    let currentState = { ...HealthChassis.scenarios.base };
-
-    // DOM Elements
-    const leverContainer = document.getElementById('lever-container');
-    const scenarioContainer = document.getElementById('scenario-container');
-    const actionContainer = document.getElementById('action-feed-container');
-
-    // UI Builders
-    function buildUI() {
-        // Build Levers
-        HealthChassis.levers.forEach(lever => {
-            const div = document.createElement('div');
-            div.className = 'lever';
-            div.innerHTML = `
-                <div class="lever-header">
-                    <span>${lever.label}</span>
-                    <span class="lever-val" id="val-${lever.key}">${currentState[lever.key]}${lever.unit}</span>
-                </div>
-                <input type="range" min="${lever.min}" max="${lever.max}" step="${lever.step}" value="${currentState[lever.key]}" data-key="${lever.key}">
-            `;
-            leverContainer.appendChild(div);
-
-            div.querySelector('input').addEventListener('input', (e) => {
-                const val = parseFloat(e.target.value);
-                currentState[lever.key] = val;
-                document.getElementById(`val-${lever.key}`).textContent = val + lever.unit;
-                runSimulation();
-            });
-        });
-
-        // Build Scenarios
-        Object.keys(HealthChassis.scenarios).forEach(key => {
-            const btn = document.createElement('button');
-            btn.className = `scenario-btn ${key === 'base' ? 'active' : ''}`;
-            btn.textContent = key.replace('_', ' ').toUpperCase();
-            btn.addEventListener('click', () => {
-                currentState = { ...HealthChassis.scenarios[key] };
-                document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                refreshLevers();
-                runSimulation();
-            });
-            scenarioContainer.appendChild(btn);
-        });
-
-        // Build Action Feed
-        HealthBody.actionFeed.forEach(action => {
-            const btn = document.createElement('button');
-            btn.className = 'action-btn';
-            btn.innerHTML = `
-                <div class="action-label">${action.label}</div>
-                <div class="action-desc">${action.description}</div>
-            `;
-            btn.addEventListener('click', () => {
-                Object.keys(action.impact).forEach(k => {
-                    currentState[k] += action.impact[k];
-                    // Clamp values
-                    const lever = HealthChassis.levers.find(l => l.key === k);
-                    if (lever) currentState[k] = Math.max(lever.min, Math.min(lever.max, currentState[k]));
-                });
-                refreshLevers();
-                runSimulation();
-            });
-            actionContainer.appendChild(btn);
-        });
-    }
-
-    function refreshLevers() {
-        document.querySelectorAll('input[type="range"]').forEach(input => {
-            const key = input.dataset.key;
-            input.value = currentState[key];
-            const lever = HealthChassis.levers.find(l => l.key === key);
-            document.getElementById(`val-${key}`).textContent = currentState[key] + lever.unit;
-        });
-    }
-
-    function runSimulation() {
-        const result = engine.iterate(currentState);
-        
-        // Ejecutar Monte Carlo y mezclar nodos virtuales en el resultado
-        const mcNodes = runMonteCarlo(engine.model, HealthChassis.levers, currentState, 1000);
-        Object.assign(result, mcNodes);
-
-        updateDashboard(result);
-    }
-
-    function updateDashboard(res) {
-        document.getElementById('ebitda-val').textContent = `$${res.ebitda.toFixed(1)}M`;
-        document.getElementById('sini-val').textContent = `${res.tasa_siniestralidad.toFixed(1)}%`;
-        document.getElementById('occupancy-val').textContent = `${res.ocupacion_camas.toFixed(1)}%`;
-        document.getElementById('cap-val').textContent = Math.round(res.capacidad_quirurgica);
-        document.getElementById('readmit-val').textContent = res.readmisiones.toFixed(1);
-        document.getElementById('risk-val').textContent = `${res.probabilidad_falla.toFixed(1)}%`;
-        document.getElementById('multas-val').textContent = `$${res.multas.toFixed(2)}M`;
-        document.getElementById('reput-val').textContent = `$${res.impacto_reputacional.toFixed(1)}M`;
-        
-        document.getElementById('it-count').textContent = `Iterations: ${res._metadata.iterations}`;
-        
-        const ebitdaEl = document.getElementById('ebitda-val');
-        if (res.ebitda > 500) ebitdaEl.style.color = 'var(--success)';
-        else if (res.ebitda < 0) ebitdaEl.style.color = 'var(--danger)';
-        else ebitdaEl.style.color = 'var(--accent)';
-
-        // Inyectar el mensaje probabilístico en el Action Feed (Dashboard Premium)
-        const actionContainer = document.getElementById('action-feed-container');
-        // Remover mensaje probabilístico anterior si existe
-        const oldMsg = document.getElementById('mc-insight');
-        if (oldMsg) oldMsg.remove();
-        
-        if (res.ebitda_p50 !== undefined) {
-            const conf = (100 - res.probabilidad_perdida).toFixed(1);
-            const risk = res.probabilidad_perdida.toFixed(1);
-            
-            const insightDiv = document.createElement('div');
-            insightDiv.id = 'mc-insight';
-            insightDiv.style.padding = '1rem';
-            insightDiv.style.marginBottom = '1rem';
-            insightDiv.style.borderRadius = '8px';
-            insightDiv.style.background = risk > 20 ? 'rgba(231, 76, 60, 0.1)' : 'rgba(39, 174, 96, 0.1)';
-            insightDiv.style.border = `1px solid ${risk > 20 ? 'var(--danger)' : 'var(--success)'}`;
-            
-            insightDiv.innerHTML = `
-                <div style="font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem;">🔮 Inteligencia Probabilística (1,000 iteraciones)</div>
-                <div style="font-size: 0.8rem; color: var(--text-dim);">
-                    Hay un <strong>${conf}% de confianza</strong> de que el EBITDA superará los $${res.ebitda_p10.toFixed(1)}M USD (P10), 
-                    con un valor esperado de $${res.ebitda_p50.toFixed(1)}M USD (P50). 
-                    Existe un <strong>${risk}% de riesgo de pérdida operacional</strong> ($P(EBITDA < 0)$).
-                </div>
-            `;
-            actionContainer.prepend(insightDiv);
-        }
-    }
-
-    buildUI();
-    runSimulation();
-
-</script>
 
 </body>
 </html>
