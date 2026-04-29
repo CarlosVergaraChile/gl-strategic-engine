@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GL Strategic Engine | FinOps Vertical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1b4f72;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-dim: #7f8c8d;
+            --border: #dcdde1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-live { background: var(--success); color: white; }
+        .badge-mode { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Levers */
+        .lever-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .lever {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .lever-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        .lever-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+        }
+
+        /* KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .kpi-box {
+            text-align: left;
+        }
+
+        .kpi-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Action Feed */
+        .action-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            background: rgba(52, 152, 219, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .action-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .action-desc {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .graph-container {
+            flex: 1;
+            background: linear-gradient(135deg, #1b4f72, #0d2b3e);
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .ebitda-gauge {
+            font-size: 4rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+        }
+
+        .iteration-badge {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        .scenario-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .scenario-btn {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-main);
+            cursor: pointer;
+            font-size: 0.875rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .scenario-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .scenario-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>FinOps Strategist <span style="font-weight: 300; opacity: 0.7;">| Banking & Risk Model</span></h1>
+    <div class="header-badges">
+        <div class="badge badge-live">Engine v3.0</div>
+        <div class="badge badge-mode" id="it-count">Iterations: 0</div>
+    </div>
+</header>
+
+<main>
+    <div class="column">
+        <div class="card animate">
+            <div class="card-title">⚙️ Palancas de Riesgo</div>
+            <div class="lever-group" id="lever-container">
+            </div>
+        </div>
+
+        <div class="card animate" style="animation-delay: 0.1s;">
+            <div class="card-title">📊 Escenarios Financieros</div>
+            <div class="scenario-selector" id="scenario-container">
+            </div>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="graph-container animate" style="animation-delay: 0.2s;">
+            <div class="kpi-label" style="color: rgba(255,255,255,0.6)">EBITDA OPERACIONAL ESTIMADO (USD)</div>
+            <div class="ebitda-gauge" id="ebitda-val">$0</div>
+            
+            <div style="margin-top: 3rem; width: 80%; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div class="kpi-box" style="text-align: center; border-right: 1px solid rgba(255,255,255,0.1);">
+                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">MULTAS CMF</div>
+                    <div class="kpi-value" id="risk-val" style="color: var(--warning)">$0</div>
+                </div>
+                <div class="kpi-box" style="text-align: center;">
+                    <div class="kpi-label" style="color: rgba(255,255,255,0.6)">RISG BRECHA DATOS</div>
+                    <div class="kpi-value" id="breach-val" style="color: var(--danger)">$0</div>
+                </div>
+            </div>
+
+            <div class="iteration-badge" id="engine-status">Causal Graph Converged</div>
+        </div>
+
+        <div class="card animate" style="animation-delay: 0.3s;">
+            <div class="card-title">🎯 Plan de Acción Estratégica</div>
+            <div class="action-feed" id="action-feed-container">
+            </div>
+        </div>
+    </div>
+
+    <div class="column">
+        <div class="card animate" style="animation-delay: 0.4s;">
+            <div class="card-title">📈 KPIs de Cartera</div>
+            <div class="kpi-grid">
+                <div class="kpi-box">
+                    <div class="kpi-label">Riesgo NPL (Default)</div>
+                    <div class="kpi-value" id="npl-val">0%</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Provisiones por Riesgo</div>
+                    <div class="kpi-value" id="provision-val">$0</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Volumen de Colocaciones</div>
+                    <div class="kpi-value" id="vol-val">$0</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-label">Costo de Fondeo</div>
+                    <div class="kpi-value" id="funds-val">$0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card animate" style="animation-delay: 0.5s;">
+            <div class="card-title">⚖️ Margen Financiero</div>
+            <div class="kpi-box">
+                <div class="kpi-label">Ingresos por Intereses</div>
+                <div class="kpi-value" id="income-val" style="color: var(--success)">$0</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+    import StrategicEngine from './engine.js';
+    import { chassis } from './verticals/finops/chassis.js';
+    import { body } from './verticals/finops/body.js';
+
+    const engine = new StrategicEngine(1000);
+    engine.setModel(chassis.model || { nodes: chassis.nodes, edges: chassis.edges });
+
+    let currentState = { ...chassis.scenarios.base.values };
+    
+    // Initialize current state with default values from inputs if not in scenario
+    Object.keys(chassis.inputs).forEach(k => {
+        if (currentState[k] === undefined) currentState[k] = chassis.inputs[k].value;
+    });
+
+    const leverContainer = document.getElementById('lever-container');
+    const scenarioContainer = document.getElementById('scenario-container');
+    const actionContainer = document.getElementById('action-feed-container');
+
+    function formatCurrency(val) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+    }
+
+    function buildUI() {
+        Object.keys(chassis.inputs).forEach(key => {
+            const input = chassis.inputs[key];
+            const div = document.createElement('div');
+            div.className = 'lever';
+            div.innerHTML = `
+                <div class="lever-header">
+                    <span>${input.label}</span>
+                    <span class="lever-val" id="val-${key}">${currentState[key]}${input.unit === 'percent' ? '%' : ''}</span>
+                </div>
+                <input type="range" min="${input.min}" max="${input.max}" step="${input.step}" value="${currentState[key]}" data-key="${key}">
+            `;
+            leverContainer.appendChild(div);
+
+            div.querySelector('input').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                currentState[key] = val;
+                document.getElementById(`val-${key}`).textContent = val + (input.unit === 'percent' ? '%' : '');
+                runSimulation();
+            });
+        });
+
+        Object.keys(chassis.scenarios).forEach(key => {
+            const scenario = chassis.scenarios[key];
+            const btn = document.createElement('button');
+            btn.className = `scenario-btn ${key === 'base' ? 'active' : ''}`;
+            btn.textContent = scenario.label;
+            btn.addEventListener('click', () => {
+                currentState = { ...scenario.values };
+                // Ensure all inputs have a value
+                Object.keys(chassis.inputs).forEach(k => {
+                    if (currentState[k] === undefined) currentState[k] = chassis.inputs[k].value;
+                });
+                document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                refreshLevers();
+                runSimulation();
+            });
+            scenarioContainer.appendChild(btn);
+        });
+
+        body.actionFeed.forEach(action => {
+            const btn = document.createElement('button');
+            btn.className = 'action-btn';
+            btn.innerHTML = `
+                <div class="action-label">${action.label}</div>
+                <div class="action-desc">${action.description}</div>
+            `;
+            btn.addEventListener('click', () => {
+                Object.keys(action.impact).forEach(k => {
+                    currentState[k] = (currentState[k] || 0) + action.impact[k];
+                    const input = chassis.inputs[k];
+                    if (input) currentState[k] = Math.max(input.min, Math.min(input.max, currentState[k]));
+                });
+                refreshLevers();
+                runSimulation();
+            });
+            actionContainer.appendChild(btn);
+        });
+    }
+
+    function refreshLevers() {
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            const key = input.dataset.key;
+            if (currentState[key] !== undefined) {
+                input.value = currentState[key];
+                const config = chassis.inputs[key];
+                document.getElementById(`val-${key}`).textContent = currentState[key] + (config.unit === 'percent' ? '%' : '');
+            }
+        });
+    }
+
+    function runSimulation() {
+        const result = engine.iterate(currentState);
+        updateDashboard(result);
+    }
+
+    function updateDashboard(res) {
+        document.getElementById('ebitda-val').textContent = formatCurrency(res.ebitda);
+        document.getElementById('npl-val').textContent = `${res.probabilidad_default.toFixed(2)}%`;
+        document.getElementById('provision-val').textContent = formatCurrency(res.provisiones_riesgo);
+        document.getElementById('vol-val').textContent = formatCurrency(res.volumen_colocaciones);
+        document.getElementById('funds-val').textContent = formatCurrency(res.costo_fondos);
+        document.getElementById('risk-val').textContent = formatCurrency(res.riesgo_sancion_cmf);
+        document.getElementById('breach-val').textContent = formatCurrency(res.impacto_brecha_datos);
+        document.getElementById('income-val').textContent = formatCurrency(res.ingreso_intereses);
+        
+        document.getElementById('it-count').textContent = `Iterations: ${res._metadata.iterations}`;
+        
+        const ebitdaEl = document.getElementById('ebitda-val');
+        if (res.ebitda > 5000000) ebitdaEl.style.color = 'var(--success)';
+        else if (res.ebitda < 1000000) ebitdaEl.style.color = 'var(--danger)';
+        else ebitdaEl.style.color = 'var(--accent)';
+    }
+
+    buildUI();
+    runSimulation();
+
+</script>
+
+</body>
+</html>
