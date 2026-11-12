@@ -67,3 +67,26 @@ Investigación externa en páginas oficiales de proveedores, organismos público
 - 22 pruebas previas del núcleo verifican corrección técnica parcial, **no** sensibilidad real, calidad financiera, validación clínica o eficacia de decisiones.
 - No publicar datos privados de clientes, credenciales, nombres de estudiantes ni información personal.
 - Mantener apps verticales independientes y desplegables; core versionado por contrato y migración gradual.
+
+
+## Benchmark vertical detallado — proveedores especializados
+
+### Salud: flujo hospitalario y pabellones
+- **LeanTaaS iQueue OR:** https://leantaas.com/products/operating-rooms/ — gestión de bloques quirúrgicos, liberación de capacidad, preparación, dotación, puntualidad y utilización; experiencia operativa accionable, no únicamente cuadros de mando.
+- **Qventus Inpatient Capacity:** https://www.qventus.com/solutions/discharge-planning/ — asistentes operativos de planificación de altas, secuenciamiento de exámenes y coordinación integrada con ficha clínica. Los porcentajes de impacto publicados son afirmaciones comerciales del proveedor, no una promesa transferible a Chile.
+- Para HealthEye: primera pantalla debe mostrar **camas efectivas hoy, altas probables verificadas, atrasos críticos, pabellones disponibles y decisiones a resolver**, con responsable y seguimiento; no una colección indiscriminada de KPI.
+
+### Salmonicultura: operaciones biológicas y económicas
+- **AKVA fishtalk:** https://www.akvagroup.com/fishtalk/ — gestión desde datos diarios (FCR, SGR, mortalidad, tratamientos) hasta planes biológicos/financieros y trazabilidad cosecha; integración con sensores por API.
+- **Aquabyte:** https://www.aquabyte.ai/ — visión computacional para crecimiento, bienestar, parásitos y comportamiento. Es referente de capa sensórica, NO evidencia de que nuestro software disponga de esas mediciones.
+- Para AquaEye: separar **observaciones reales del centro**, **contexto regulatorio público**, **estado inferido** y **consecuencias de acciones**. Una tasa nacional no reemplaza un sensor o conteo semanal de peces del centro.
+
+### Riesgo financiero
+- **SAS Intelligent Decisioning:** https://support.sas.com/en/software/intelligent-decisioning-support.html — reglas de negocio, detección de eventos, gobierno de decisiones y análisis avanzado. Relevante para parametrizar políticas sin confundir reglas de negocio con un modelo estadístico validado.
+- **Dataiku Govern:** https://www.dataiku.com/product/govern-ai-everywhere — registro de modelos, propietarios, aprobaciones y políticas antes de desplegar; adopción de gobernanza por niveles de riesgo.
+- Para NovisEye y EquifaxEye: no convertir datos internos del cliente en parámetros globales compartidos; exigir multi-tenant seguro, reglas versionadas y evaluación previa a decisiones crediticias o regulatorias.
+
+## Decisión de implementación basada en benchmark
+No competir con suites empresariales replicando todas sus pantallas. Priorizar un **asistente semanal de decisiones tácticas** que recoja estado diario, muestre 2–5 acciones posibles, simule sus consecuencias, registre la aprobación humana y verifique el resultado una semana después. Comenzar con una sola decisión operacional por vertical que tenga datos trazables y responsable concreto.
+
+Las funciones de `core/evidence-decisions.js` proporcionan un primer contrato experimental para evidencia, decisión y resultado observado. Todavía NO se conectan a una base transaccional ni demuestran adopción por usuarios reales.
