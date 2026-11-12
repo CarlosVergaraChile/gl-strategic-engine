@@ -1,0 +1,10 @@
+import test from "node:test";import assert from "node:assert/strict";
+import {createCommitment,updateCommitment,commitmentDashboard,exportCommitmentsCSV} from "../adapters/health/commitments.js";
+const input={id:"c1",facility:"Hospital SIMULADO",weekStarting:"2026-11-09",topicId:"ed-capacity-gap",title:"Verificar camas bloqueadas",ownerRole:"Gestión de camas",owner:"Coordinación de camas",createdAt:"2026-11-09T12:00:00Z",dueDate:"2026-11-13"};
+test("commitment contains accountable owner and deadline",()=>{const c=createCommitment(input);assert.equal(c.status,"pending");assert.equal(c.dueDate,"2026-11-13")});
+test("cannot close as completed without evidence",()=>{const c=createCommitment(input);assert.throws(()=>updateCommitment(c,{status:"completed",at:"2026-11-12T13:00:00Z",by:"Coordinador"}),/evidence/)});
+test("real admin progress needs recorded actor and evidence",()=>{const c=createCommitment(input);const d=updateCommitment(c,{status:"completed",evidence:"Acta de coordinación N°1",at:"2026-11-12T13:00:00Z",by:"Coordinador"});assert.equal(d.status,"completed");assert.equal(d.history.length,2);assert.equal(commitmentDashboard([d],"2026-11-14").completedWithEvidence,1)});
+test("overdue is counted based on dueDate, not a guessed benefit",()=>{const c=createCommitment(input);const d=commitmentDashboard([c],"2026-11-14");assert.equal(d.overdue,1);assert.equal(d.completed,0);assert.match(d.note,/not evidence/)});
+test("closed items cannot be silently edited",()=>{const c=updateCommitment(createCommitment(input),{status:"completed",evidence:"Acta",at:"2026-11-12T13:00:00Z",by:"Coordinador"});assert.throws(()=>updateCommitment(c,{status:"pending",at:"2026-11-13T13:00:00Z",by:"Otro"}),/closed/)});
+test("exports spreadsheet-friendly CSV with quoting",()=>{const c=createCommitment({...input,title:'Verificar "camas"'});const csv=exportCommitmentsCSV([c]);assert.ok(csv.includes('""camas""'));assert.ok(csv.includes("Gestión de camas"))});
+test("duplicate commitments rejected",()=>{const c=createCommitment(input);assert.throws(()=>commitmentDashboard([c,c],"2026-11-12"),/duplicate/)});
