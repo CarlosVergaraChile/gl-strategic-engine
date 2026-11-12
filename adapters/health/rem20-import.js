@@ -56,10 +56,10 @@ export function normalizeRem20(raw,{columns,sourceUrl,releaseDate,area=null}={})
     const establishment=String(r[columns.establishment]??"").trim();
     if(!establishment||!Number.isInteger(year)||year<2000||year>2100||!Number.isInteger(month)||month<1||month>12)
       throw new Error("invalid institution/period at row "+(i+1));
-    if(!Number.isFinite(occupiedBedDays)||!Number.isFinite(availableBedDays)||occupiedBedDays<0||availableBedDays<=0)
+    if(!Number.isFinite(occupiedBedDays)||!Number.isFinite(availableBedDays)||occupiedBedDays<0||availableBedDays<0)
       throw new Error("invalid bed-days at row "+(i+1));
     return {establishment,year,month,functionalArea:columns.functionalArea?r[columns.functionalArea]:null,
-      occupiedBedDays,availableBedDays,sourceType:"official_aggregate",sourceUrl,releaseDate,
+      occupiedBedDays,availableBedDays,qualityFlags:[...(availableBedDays===0?["ZERO_AVAILABLE_BED_DAYS"]:[]),...(occupiedBedDays>availableBedDays&&availableBedDays>0?["OVER_100_PERCENT_OCCUPANCY"]:[])],sourceType:"official_aggregate",sourceUrl,releaseDate,
       periodGranularity:"month"};
   }).filter(Boolean);
 }
@@ -74,7 +74,7 @@ export function summarizeRem20(records,{establishment=null,year=null,area=null}=
   const available=selected.reduce((n,r)=>n+r.availableBedDays,0);
   if(available<=0)throw new Error("invalid aggregate denominator");
   return {sourceType:"official_aggregate",periodGranularity:"month",establishment,year,area,
-    rows:selected.length,occupiedBedDays:occupied,availableBedDays:available,
+    rows:selected.length,eligibleRows:eligible.length,excludedZeroBedDays,\n    rowsOver100Pct:eligible.filter(r=>r.occupiedBedDays>r.availableBedDays).length,\n    occupiedBedDays:occupied,availableBedDays:available,
     occupancyPct:100*occupied/available,
     warning:"Monthly aggregated benchmark. Not a daily census, not inferred effective beds."};
 }
