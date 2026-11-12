@@ -5,11 +5,13 @@ on:
     branches:
       - arquitectura-nucleo-compartido-v3
       - healtheye-revision-semanal-v04
+      - healtheye-flujo-compromisos-v05
     paths:
       - 'adapters/health/**'
       - 'demos/health/**'
       - 'tests/**'
       - '.github/workflows/package-healtheye.yml'
+      - 'scripts/validate-healtheye-bundle.mjs'
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -25,13 +27,17 @@ jobs:
       - name: Build standalone static directory for Hostinger
         run: |
           mkdir -p dist/healtheye/adapters/health dist/healtheye/core
-          cp adapters/health/{daily-flow,surgical-flow,integrated-flow,synthetic-source,weekly-review,commitments}.js dist/healtheye/adapters/health/
+          cp adapters/health/{daily-flow,surgical-flow,integrated-flow,synthetic-source,weekly-review,commitments,commitment-demo-store}.js dist/healtheye/adapters/health/
           sed 's#../../adapters/health/#./adapters/health/#g' demos/health/integrado.html > dist/healtheye/index.html
           sed 's#../../adapters/health/#./adapters/health/#g' demos/health/semanal.html > dist/healtheye/semanal.html
           sed 's#../../adapters/health/#./adapters/health/#g' demos/health/compromisos.html > dist/healtheye/compromisos.html
+          sed 's#../../adapters/health/#./adapters/health/#g' demos/health/verificar.html > dist/healtheye/verificar.html
+          printf '{"product":"HealthEye","release":"v0.5-rc","commit":"%s"}\n' "$GITHUB_SHA" > dist/healtheye/version.json
+          node scripts/validate-healtheye-bundle.mjs dist/healtheye
           cat > dist/healtheye/README.txt <<'EOF'
           HealthEye static DEMO — synthetic data only, no patient information.
-          Includes index.html (daily) and semanal.html (weekly review).
+          Includes index.html (daily), semanal.html (weekly review), compromisos.html and verificar.html.
+          Check /healtheye/verificar.html for installed version and module tests.
           Upload the contents of the healtheye folder to public_html/healtheye/
           The index.html must sit next to adapters/health/ folder.
           Existing Hostinger projects are unaffected by this self-contained directory.
