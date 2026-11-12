@@ -35,3 +35,20 @@ test("no duplicate header names or broken CSV rows",()=>{
  assert.throws(()=>parseDelimited("A;A\n1;2",";"),/headers/);
  assert.throws(()=>parseDelimited("A;B\n1;2;3",";"),/column count/);
 });
+
+test("zero available beds remain visible as excluded data-quality rows",()=>{
+ const csv=sample+'Hospital Ejemplo;2026;3;Medicina;5;0\n';
+ const rows=normalizeRem20(parseDelimited(csv,";").rows,{columns,sourceUrl,releaseDate:"2026-10-27"});
+ const r=summarizeRem20(rows);
+ assert.equal(rows.length,3);assert.equal(r.excludedZeroBedDays,1);
+ assert.equal(r.occupancyPct,100*100/120);
+});
+test("occupancy above 100 percent is visible, never truncated",()=>{
+ const csv=sample.replace(";90;100",";110;100");
+ const rows=normalizeRem20(parseDelimited(csv,";").rows,{columns,sourceUrl,releaseDate:"2026-10-27"});
+ const r=summarizeRem20(rows);
+ assert.equal(r.rowsOver100Pct,1);
+ assert.equal(r.occupancyPct,100*120/120);
+ const solo=summarizeRem20([rows[0]]);
+ assert.equal(solo.occupancyPct,110);
+});
