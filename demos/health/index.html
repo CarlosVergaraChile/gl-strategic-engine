@@ -1,0 +1,43 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HealthEye | Flujo urgencia–cama–alta</title>
+<style>:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#22374b;background:#f3f6f9}*{box-sizing:border-box}body{margin:0}header{background:#17334b;color:white;padding:32px 5vw}h1{font-size:clamp(27px,4vw,42px);margin:5px 0 10px}header p{max-width:800px;color:#d5e3ed}.chip{display:inline-block;background:#f9e2a7;color:#392a0a;border-radius:22px;font-size:12px;padding:4px 10px;font-weight:750;letter-spacing:.03em}main{max-width:1160px;margin:32px auto;padding:0 20px 50px}.layout{display:grid;grid-template-columns:1fr 1.1fr;gap:18px}.panel{background:white;border:1px solid #dde5ec;border-radius:12px;padding:22px}h2{margin:0 0 16px;font-size:21px}label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:650}input{font:inherit;border:1px solid #b9cbd6;border-radius:6px;padding:9px;width:100%;max-width:100%}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.fields .wide{grid-column:1/-1}button{border:none;border-radius:7px;background:#1a577a;color:white;font-weight:700;padding:11px 18px;cursor:pointer;margin-top:20px}.note{color:#657a88;font-size:13px}.status{background:#f1f5f9;padding:12px;border-radius:8px}.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.kpi{padding:15px;border:1px solid #d9e4ee;border-radius:8px}.kpi b{display:block;font-size:28px;color:#133c56}.kpi small{color:#627788}.alerts{list-style:none;padding:0}.alerts li{padding:11px 12px;margin:8px 0;border-left:3px solid #ad7a31;background:#fff7e8}.actions{padding-left:21px}.actions li{margin:12px 0}.actions strong{display:block}#error{color:#b52323;white-space:pre-wrap}.empty{font-style:italic;color:#627788}@media(max-width:800px){.layout{grid-template-columns:1fr}.fields{grid-template-columns:1fr}}</style></head><body>
+<header><div class="chip">DEMOSTRACIÓN · DATOS FICTICIOS</div><h1>HealthEye · Flujo urgencia–cama–alta</h1><p>Una vista para coordinar recursos y detectar restricciones con datos diarios agregados. Las propuestas requieren revisión y aprobación humana; no reemplaza protocolos clínicos.</p></header>
+<main><div class="layout"><section class="panel"><h2>Censo y capacidad de hoy</h2><p class="note">Modifica las cifras de ejemplo para comprobar cómo cambian los resultados. No ingreses nombres, RUT ni datos de pacientes.</p><form id="census"><div class="fields">
+<label class="wide">Establecimiento<input name="facility" value="Hospital demostrativo" required></label>
+<label>Fecha de corte<input type="date" name="date" value="2026-11-11" required></label>
+<label>Hora de registro (ISO)<input name="recordedAt" value="2026-11-11T07:00:00Z" required></label>
+<label>Camas físicas<input name="physicalBeds" type="number" min="0" value="100" required></label>
+<label>Camas habilitadas<input name="enabledBeds" type="number" min="0" value="90" required></label>
+<label>Camas con dotación<input name="staffedBeds" type="number" min="0" value="80" required></label>
+<label>Camas bloqueadas<input name="blockedBeds" type="number" min="0" value="5" required></label>
+<label>Camas ocupadas<input name="occupiedBeds" type="number" min="0" value="72" required></label>
+<label>Pacientes de urgencia esperando cama<input name="edPatientsAwaitingBed" type="number" min="0" value="12" required></label>
+<label>Espera agregada máxima (horas)<input name="edPatientsAwaitingBedSinceHours" type="number" min="0" value="15" required></label>
+<label>Altas previstas<input name="expectedDischarges" type="number" min="0" value="7" required></label>
+<label>Altas confirmadas<input name="confirmedDischarges" type="number" min="0" value="4" required></label>
+</div><button type="submit">Evaluar capacidad</button><p id="error" role="alert"></p></form></section>
+<section class="panel" aria-live="polite"><h2>Lectura operacional</h2><div id="result"><p class="empty">Ejecuta la evaluación.</p></div></section></div><p class="note">Este demostrador solo procesa valores introducidos en el navegador. No envía datos ni guarda registros en servidores. La disponibilidad real debe validarse por especialidad, dotación, seguridad, cuidados requeridos y coordinación local.</p></main>
+<script type="module">
+import { draftDailyCoordination } from "../../adapters/health/daily-flow.js";
+const form=document.getElementById("census"),output=document.getElementById("result"),error=document.getElementById("error");
+const labels={effectiveBeds:"Camas efectivas",availableNow:"Disponibles ahora",projectedWithConfirmedDischarges:"Capacidad tras altas confirmadas",unmetAfterConfirmedDischarges:"Demanda aún sin resolver"};
+function node(tag,text,cls){const x=document.createElement(tag);if(cls)x.className=cls;x.textContent=String(text);return x;}
+form.addEventListener("submit",e=>{
+ e.preventDefault();error.textContent="";output.replaceChildren();
+ try{
+  const data=Object.fromEntries(new FormData(form).entries());
+  for(const k of ["physicalBeds","enabledBeds","staffedBeds","blockedBeds","occupiedBeds","edPatientsAwaitingBed","expectedDischarges","confirmedDischarges","edPatientsAwaitingBedSinceHours"])data[k]=Number(data[k]);
+  data.source="synthetic-ui";
+  const r=draftDailyCoordination(data),a=r.assessment;
+  const metrics=node("div","","kpis");
+  for(const k of Object.keys(labels)){const card=node("div","","kpi");card.append(node("b",a[k]),node("small",labels[k]));metrics.append(card);}
+  output.append(metrics,node("h3","Señales para revisión"));
+  if(!a.flags.length)output.append(node("p","Sin alertas derivadas de las reglas demostrativas."));
+  const alerts=node("ul","","alerts");for(const f of a.flags)alerts.append(node("li",f.message));output.append(alerts);
+  output.append(node("h3","Propuestas de coordinación"));
+  const actions=node("ol","","actions");for(const action of r.actions){const li=node("li","");li.append(node("strong",action.ownerRole),node("span",action.proposal));actions.append(li);}
+  output.append(actions);
+  output.append(node("p",r.warning,"note"));
+ }catch(ex){error.textContent=ex.message||"Error de validación";}
+});
+form.requestSubmit();
+</script></body></html>
