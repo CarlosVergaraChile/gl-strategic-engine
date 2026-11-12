@@ -25,8 +25,10 @@ export function parseDelimited(text,delimiter=",") {
       else cell+=c;
     }else if(c==='"'){if(cell.trim())throw new Error("unexpected quote");quoted=true;}
     else if(c===delimiter){row.push(cell);cell="";}
-    else if(c==="\n"||c==="\r"){
-      if(c==="\r"&&src[i+1]==="\n")i++;
+    else if(c==="
+"||c==="\r"){
+      if(c==="\r"&&src[i+1]==="
+")i++;
       row.push(cell);if(row.some(x=>x!==""))records.push(row);row=[];cell="";
     }else cell+=c;
   }
@@ -74,7 +76,9 @@ export function summarizeRem20(records,{establishment=null,year=null,area=null}=
   const available=selected.reduce((n,r)=>n+r.availableBedDays,0);
   if(available<=0)throw new Error("invalid aggregate denominator");
   return {sourceType:"official_aggregate",periodGranularity:"month",establishment,year,area,
-    rows:selected.length,eligibleRows:eligible.length,excludedZeroBedDays,\n    rowsOver100Pct:eligible.filter(r=>r.occupiedBedDays>r.availableBedDays).length,\n    occupiedBedDays:occupied,availableBedDays:available,
+    rows:selected.length,eligibleRows:eligible.length,excludedZeroBedDays,
+    rowsOver100Pct:eligible.filter(r=>r.occupiedBedDays>r.availableBedDays).length,
+    occupiedBedDays:occupied,availableBedDays:available,
     occupancyPct:100*occupied/available,
     warning:"Monthly aggregated benchmark. Not a daily census, not inferred effective beds."};
 }
