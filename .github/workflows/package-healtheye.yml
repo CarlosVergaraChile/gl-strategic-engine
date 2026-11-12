@@ -1,0 +1,42 @@
+name: HealthEye static preview package
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - arquitectura-nucleo-compartido-v3
+    paths:
+      - 'adapters/health/**'
+      - 'demos/health/**'
+      - 'tests/**'
+      - '.github/workflows/package-healtheye.yml'
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify model
+        run: node --test tests/*.test.js
+      - name: Build standalone static directory for Hostinger
+        run: |
+          mkdir -p dist/healtheye/adapters/health dist/healtheye/core
+          cp adapters/health/{daily-flow,surgical-flow,integrated-flow,synthetic-source}.js dist/healtheye/adapters/health/
+          sed 's#../../adapters/health/#./adapters/health/#g' demos/health/integrado.html > dist/healtheye/index.html
+          cat > dist/healtheye/README.txt <<'EOF'
+          HealthEye static DEMO — synthetic data only, no patient information.
+          Upload the contents of the healtheye folder to public_html/healtheye/
+          The index.html must sit next to adapters/health/ folder.
+          Existing Hostinger projects are unaffected by this self-contained directory.
+          No clinical decisions; no live MINSAL or HEC data.
+          EOF
+          cd dist && zip -r ../healtheye-preview.zip healtheye
+      - name: Upload complete Hostinger package
+        uses: actions/upload-artifact@v4
+        with:
+          name: healtheye-preview
+          path: healtheye-preview.zip
+          retention-days: 30
