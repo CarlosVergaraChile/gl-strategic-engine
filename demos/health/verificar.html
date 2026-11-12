@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HealthEye - Verificación de instalación</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;max-width:850px;margin:25px auto;padding:0 18px;color:#20384b}
+h1{font-size:28px}li{margin:8px 0}.ok{color:#187241}.bad{color:#aa2525}.pending{color:#79652f}
+.panel{padding:16px;border:1px solid #d4e2eb;border-radius:10px;margin:15px 0}
+button{padding:12px 18px;background:#185c80;border:0;color:#fff;border-radius:7px;cursor:pointer}
+code{font-size:13px;overflow-wrap:anywhere}small{color:#65788b}a{color:#195b83}
+</style></head><body>
+<h1>HealthEye · Verificación de instalación</h1>
+<p>Prueba de los módulos reales del paquete publicado, con datos sintéticos. No envía información a otros servidores.</p>
+<div class="panel"><strong>Versión publicada:</strong> <code id="version">leyendo...</code>
+<p><small>Si aparece una versión distinta a la solicitada, el despliegue no se ha actualizado.</small></p></div>
+<button id="run">Ejecutar verificaciones</button>
+<ol id="results" aria-live="polite"></ol>
+<p id="summary" role="status"></p>
+<div class="panel"><a href="./">Operación diaria</a> · <a href="./semanal.html">Revisión semanal</a> · <a href="./compromisos.html">Compromisos</a></div>
+<script type="module">
+const results=document.getElementById("results"),summary=document.getElementById("summary");
+let failures=0,passed=0;
+function result(label,success,details=""){
+ const li=document.createElement("li");li.className=success?"ok":"bad";
+ li.textContent=(success?"APROBADO: ":"FALLÓ: ")+label+(details?" — "+details:"");
+ results.append(li);success?passed++:failures++;
+}
+async function check(label,fn){
+ try{await fn();result(label,true)}catch(err){result(label,false,err.message||String(err))}
+}
+function expect(x,message){if(!x)throw new Error(message)}
+const version=document.getElementById("version");
+try{
+ const response=await fetch("./version.json",{cache:"no-store"});
+ expect(response.ok,"version.json no disponible");
+ const v=await response.json();
+ version.textContent=v.product+" "+v.release+" — commit "+v.commit;
+}catch(err){version.textContent="No se pudo determinar la versión: "+err.message}
+async function run(){
+ results.replaceChildren();summary.textContent="Ejecutando...";passed=0;failures=0;
+ let synthetic,integrated,weekly,commitment,backup;
+ await check("Carga de módulos de análisis hospitalario",async()=>{
+  synthetic=await import("./adapters/health/synthetic-source.js");
+  integrated=await import("./adapters/health/integrated-flow.js");
+  weekly=await import("./adapters/health/weekly-review.js");
+  expect(typeof weekly.makeWeeklyReviews==="function","módulo semanal ausente");
+ });
+ await check("28 jornadas sintéticas y modelo integrado",async()=>{
+  expect(synthetic&&integrated,"dependencias no cargadas");
+  const source=synthetic.generateSyntheticHospitalDays({seed:20261112,startDate:"2026-10-12",days:28});
+  expect(source.provenance==="synthetic"&&source.records.length===28,"generación incorrecta");
+  const summary=integrated.summarizeIntegratedSeries(source.records);
+  expect(summary.days===28,"faltan jornadas");
+ });
+ await check("Cuatro revisiones semanales",async()=>{
+  expect(weekly&&synthetic,"dependencias no cargadas");
+  const source=synthetic.generateSyntheticHospitalDays({startDate:"2026-10-12",days:28});
+  const weeks=weekly.makeWeeklyReviews(source.records);
+  expect(weeks.length===4&&weeks.every(x=>x.quality.daysReported===7),"revisiones incorrectas");
+ });
+ await check("Módulo de compromisos y cierre con evidencia",async()=>{
+  commitment=await import("./adapters/health/commitments.js");
+  const input={id:"health-check",facility:"Hospital DEMOSTRATIVO",weekStarting:"2026-11-09",
+   topicId:"ed-capacity-gap",title:"Verificar capacidad",ownerRole:"Gestión de camas",owner:"DEMO",
+   createdAt:"2026-11-09T12:00:00Z",dueDate:"2026-11-13"};
+  const item=commitment.createCommitment(input);
+  const done=commitment.updateCommitment(item,{status:"completed",evidence:"Acta DEMO",
+   at:"2026-11-12T13:00:00Z",by:"DEMO"});
+  expect(commitment.commitmentDashboard([done],"2026-11-13").completedWithEvidence===1,"cierre incorrecto");
+ });
+ await check("Exportación y restauración de respaldo DEMO",async()=>{
+  backup=await import("./adapters/health/commitment-demo-store.js");
+  const item=commitment.createCommitment({id:"restore-check",facility:"Hospital DEMOSTRATIVO",
+   weekStarting:"2026-11-09",topicId:"other",title:"Acuerdo de ejemplo",ownerRole:"Coordinación",
+   owner:"DEMO",createdAt:"2026-11-09T12:00:00Z",dueDate:"2026-11-13"});
+  const text=backup.encodeDemoBackup([item]);
+  expect(backup.decodeDemoBackup(text)[0].id===item.id,"restauración incorrecta");
+  expect(commitment.exportCommitmentsCSV([item]).includes(item.id),"CSV incorrecto");
+ });
+ await check("Rutas de las tres pantallas",async()=>{
+  for(const file of ["index.html","semanal.html","compromisos.html"]){
+   const res=await fetch("./"+file,{cache:"no-store"});
+   expect(res.ok&&res.headers.get("content-type")?.includes("html"),file+" no disponible");
+  }
+ });
+ summary.textContent=failures===0?"RESULTADO: "+passed+" pruebas aprobadas; instalación técnica operativa. Verificar además la interacción manual en móvil.":"RESULTADO: "+passed+" aprobadas, "+failures+" fallidas. No dar por validada la publicación.";
+}
+document.getElementById("run").addEventListener("click",run);
+run();
+</script></body></html>
