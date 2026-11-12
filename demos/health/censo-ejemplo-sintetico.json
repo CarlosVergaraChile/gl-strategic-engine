@@ -1,0 +1,15 @@
+{
+  "facility": "Hospital demostrativo",
+  "date": "2026-11-11",
+  "recordedAt": "2026-11-11T07:00:00Z",
+  "source": "synthetic-fixture",
+  "physicalBeds": 100,
+  "enabledBeds": 90,
+  "staffedBeds": 80,
+  "blockedBeds": 5,
+  "occupiedBeds": 72,
+  "edPatientsAwaitingBed": 12,
+  "edPatientsAwaitingBedSinceHours": 15,
+  "expectedDischarges": 7,
+  "confirmedDischarges": 4
+}
