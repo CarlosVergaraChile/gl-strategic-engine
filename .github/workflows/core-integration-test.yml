@@ -20,4 +20,4 @@ jobs:
         with:
           node-version: '22'
       - name: Validate shared Monte Carlo and AquaEye adapter
-        run: node --test tests/uncertainty-v3.test.js tests/salmon-integration.test.js tests/health-integration.test.js
+        run: node --test tests/*.test.js
