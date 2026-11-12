@@ -1,0 +1,51 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HealthEye | Compromisos</title>
+<style>:root{font:15px/1.5 system-ui,Segoe UI,sans-serif;color:#1b3447;background:#f3f6f8}*{box-sizing:border-box}body{margin:0}header{background:#15364e;color:#fff;padding:30px max(22px,calc((100vw - 1100px)/2))}h1{margin:8px 0;font-size:clamp(28px,4vw,42px)}main{max-width:1160px;margin:auto;padding:24px}section{background:#fff;border:1px solid #dde7eb;border-radius:12px;padding:20px;margin-bottom:18px}h2{font-size:21px;margin:0 0 14px}.warn{background:#fff4d9;padding:12px;border-left:4px solid #bd8822;border-radius:5px}.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}label{display:grid;gap:5px;font-size:13px;font-weight:650}input,select,textarea{font:inherit;padding:10px;border:1px solid #b5c6d1;border-radius:7px;width:100%}textarea{min-height:72px}button{border:0;padding:10px 15px;background:#215d80;color:white;font:inherit;font-weight:700;border-radius:7px;cursor:pointer;margin:9px 7px 0 0}button.secondary{background:#e8f0f5;color:#194965}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{padding:14px;border-radius:9px;background:#eef3f7}.metric strong{display:block;font-size:28px}.metric small{color:#667988}table{width:100%;border-collapse:collapse;min-width:790px}td,th{text-align:left;border-bottom:1px solid #e2e9ed;padding:10px;font-size:13px}th{background:#f2f6f8}.scroll{overflow:auto}.small{font-size:13px;color:#647c89}#error{color:#a22}a{color:#245e82}@media(max-width:760px){.fields{grid-template-columns:1fr}.summary{grid-template-columns:repeat(2,1fr)}}</style></head><body><header><b>HealthEye · gestión hospitalaria</b><h1>Compromisos semanales</h1><p>Responsable, plazo, estado y evidencia verificable. Demostración local para reuniones de coordinación.</p></header><main><section><p class="warn"><strong>DEMO, sin datos reales:</strong> los acuerdos permanecen solo en la memoria de esta pestaña mientras esté abierta; no hay cuentas de usuario, base de datos ni guardado en el servidor. No ingreses información de pacientes ni datos confidenciales.</p><p><a href="semanal.html">Volver a la revisión semanal</a></p></section>
+<section><h2>Nuevo acuerdo de coordinación</h2><form id="new"><div class="fields">
+<label>Señal / motivo<select name="topicId"><option value="ed-capacity-gap">Brecha de camas</option><option value="discharge-verification">Verificación de altas</option><option value="ed-delay">Esperas de urgencia</option><option value="surgery-capacity-gap">Restricción de pabellones</option><option value="other">Otro operativo</option></select></label>
+<label>Responsable (cargo o equipo)<input name="owner" placeholder="Gestión de Camas" required maxlength="200"></label>
+<label>Fecha compromiso<input type="date" name="dueDate" required></label>
+<label style="grid-column:1/-1">Acción acordada<input name="title" maxlength="250" placeholder="Verificar camas bloqueadas al corte diario" required></label>
+</div><button type="submit">Agregar compromiso</button><button type="button" class="secondary" id="export">Exportar acuerdos CSV</button><button type="button" class="secondary" id="reset">Reiniciar demo</button></form><p id="error" role="alert"></p></section>
+<section><h2>Resumen de cumplimiento</h2><div id="metrics" class="summary"></div></section>
+<section><h2>Registro de compromisos</h2><div class="scroll"><table><thead><tr><th>Acción</th><th>Responsable</th><th>Plazo</th><th>Estado</th><th>Evidencia / seguimiento</th><th>Actualizar</th></tr></thead><tbody id="rows"></tbody></table></div><p class="small">Un compromiso no puede marcarse completo sin evidencia escrita. La evidencia del ejemplo no confirma un cambio operacional real.</p></section></main>
+<script type="module">
+import {createCommitment,updateCommitment,commitmentDashboard,exportCommitmentsCSV} from "../../adapters/health/commitments.js";
+const form=document.getElementById("new"),rows=document.getElementById("rows"),metrics=document.getElementById("metrics"),err=document.getElementById("error");
+const today=()=>new Date().toISOString().slice(0,10);
+const monday=()=>{const d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString().slice(0,10)};
+form.elements.dueDate.value=today();
+let counter=0, items=[];
+function node(tag,text){const n=document.createElement(tag);n.textContent=String(text);return n}
+function redraw(){
+ rows.replaceChildren();metrics.replaceChildren();
+ const summary=commitmentDashboard(items,today());
+ for(const [label,value] of [["Acuerdos",summary.total],["Abiertos",summary.open],["Vencidos",summary.overdue],["Cerrados con evidencia",summary.completedWithEvidence]]){
+  const box=node("div","");box.className="metric";box.append(node("strong",value),node("small",label));metrics.append(box);
+ }
+ for(const item of items){
+  const tr=document.createElement("tr");tr.append(node("td",item.title),node("td",item.owner),node("td",item.dueDate));
+  const status=document.createElement("td"),select=document.createElement("select");
+  for(const value of ["pending","in_progress","blocked","completed","cancelled"]){
+    const opt=document.createElement("option");opt.value=value;opt.textContent=({pending:"Pendiente",in_progress:"En curso",blocked:"Bloqueado",completed:"Cerrado",cancelled:"Cancelado"})[value];select.append(opt)}
+  select.value=item.status;select.disabled=["completed","cancelled"].includes(item.status);status.append(select);tr.append(status);
+  const ev=document.createElement("td"),input=document.createElement("input");input.placeholder="Acta o evidencia";input.value=item.evidence;input.disabled=select.disabled;ev.append(input);tr.append(ev);
+  const actions=document.createElement("td"),save=node("button","Guardar");save.className="secondary";save.disabled=select.disabled;
+  save.addEventListener("click",()=>{try{
+    const updated=updateCommitment(item,{status:select.value,evidence:input.value,at:new Date().toISOString(),by:"Operador demostrativo"});
+    items=items.map(x=>x.id===item.id?updated:x);err.textContent="";redraw()
+  }catch(e){err.textContent=e.message}});
+  actions.append(save);tr.append(actions);rows.append(tr);
+ }
+}
+form.addEventListener("submit",e=>{e.preventDefault();try{
+ const data=Object.fromEntries(new FormData(form).entries());
+ const item=createCommitment({id:"demo-"+(++counter),facility:"Hospital DEMOSTRATIVO",weekStarting:monday(),topicId:data.topicId,
+ title:data.title,ownerRole:data.owner,owner:data.owner,createdAt:new Date().toISOString(),dueDate:data.dueDate});
+ items.push(item);err.textContent="";form.elements.title.value="";redraw()
+}catch(e){err.textContent=e.message}});
+document.getElementById("reset").addEventListener("click",()=>{items=[];counter=0;err.textContent="";redraw()});
+document.getElementById("export").addEventListener("click",()=>{
+ const content=exportCommitmentsCSV(items),url=URL.createObjectURL(new Blob([content],{type:"text/csv;charset=utf-8"}));
+ const a=document.createElement("a");a.href=url;a.download="healtheye_acuerdos_DEMO.csv";a.click();URL.revokeObjectURL(url);
+});redraw();
+</script></body></html>
